@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daybook | AK Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .entry-form {
+            flex: 1;
+            min-width: 300px;
+            background: #f9fafc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #4a6491;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #2c3e50;
+        }
+        
+        .entries-table {
+            flex: 2;
+            min-width: 500px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #4a6491;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        th:hover {
+            background-color: #3a547a;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9fafc;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+        }
+        
+        .whatsapp {
+            background: #25D366;
+        }
+        
+        .whatsapp:hover {
+            background: #128C7E;
+        }
+        
+        .excel {
+            background: #21A366;
+        }
+        
+        .excel:hover {
+            background: #0E7A4B;
+        }
+        
+        .report {
+            background: #FF6B6B;
+        }
+        
+        .report:hover {
+            background: #EE5353;
+        }
+        
+        .summary {
+            padding: 20px;
+            background: #e8f4fc;
+            border-radius: 8px;
+            margin: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .summary-card h3 {
+            color: #4a6491;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .vendor {
+            border-top: 4px solid #FF6B6B;
+        }
+        
+        .sale {
+            border-top: 4px solid #25D366;
+        }
+        
+        .others {
+            border-top: 4px solid #4a6491;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                min-width: 100%;
+            }
+        }
+        
+        .delete-btn {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .delete-btn:hover {
+            background: #EE5353;
+        }
+        
+        .edit-btn {
+            background: #4a6491;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .edit-btn:hover {
+            background: #2c3e50;
+        }
+        
+        .currency-note {
+            text-align: center;
+            padding: 10px;
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .search-container {
+            padding: 15px;
+            background: #f9fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-btn {
+            width: auto;
+            padding: 12px 15px;
+        }
+        
+        .day-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .day-filter button {
+            width: auto;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .active-day {
+            background: #2c3e50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Daybook | AK Store</h1>
+            <p class="subtitle">Copyright 2025 - Track your daily transactions in AED</p>
+        </header>
+        
+        <div class="content">
+            <div class="entry-form">
+                <h2>Add New Entry</h2>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" value="">
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">Transaction Type</label>
+                    <select id="type">
+                        <option value="">-- Select Type --</option>
+                        <option value="Payment Vendor">Payment Vendor</option>
+                        <option value="Sale">Sale</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Amount (AED)</label>
+                    <input type="number" id="amount" placeholder="Enter amount in AED">
+                </div>
+                
+                <div class="form-group">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" rows="3" placeholder="Enter remarks"></textarea>
+                </div>
+                
+                <button id="add-entry"><i class="fas fa-plus-circle"></i> Add Entry</button>
+                <button id="update-entry" style="display: none;"><i class="fas fa-save"></i> Update Entry</button>
+                <button id="cancel-edit" style="background: #FF6B6B; display: none;"><i class="fas fa-times"></i> Cancel Edit</button>
+                <div class="currency-note">
+                    <i class="fas fa-info-circle"></i> All amounts are in UAE Dirhams (AED)
+                </div>
+            </div>
+            
+            <div class="entries-table">
+                <h2>Transaction History</h2>
+                
+                <div class="search-container">
+                    <div class="search-input">
+                        <input type="text" id="search-input" placeholder="Search by remarks or amount...">
+                    </div>
+                    <button class="search-btn" id="search-btn"><i class="fas fa-search"></i> Search</button>
+                    <button class="search-btn" id="clear-search" style="background: #FF6B6B;"><i class="fas fa-times"></i> Clear</button>
+                </div>
+                
+                <div class="day-filter">
+                    <button id="all-days" class="active-day">All Days</button>
+                    <button id="today">Today</button>
+                    <button id="yesterday">Yesterday</button>
+                    <button id="this-week">This Week</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="date">Date <i class="fas fa-sort"></i></th>
+                            <th data-sort="type">Type <i class="fas fa-sort"></i></th>
+                            <th data-sort="amount">Amount (AED) <i class="fas fa-sort"></i></th>
+                            <th>Remarks</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entries-list">
+                        <!-- Entries will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-card vendor">
+                <h3>Total Vendor Payments</h3>
+                <p id="vendor-total">AED 0.00</p>
+            </div>
+            
+            <div class="summary-card sale">
+                <h3>Total Sales</h3>
+                <p id="sale-total">AED 0.00</p>
+            </div>
+            
+            <div class="summary-card others">
+                <h3>Other Transactions</h3>
+                <p id="others-total">AED 0.00</p>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="action-btn whatsapp" id="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Send via WhatsApp
+            </button>
+            
+            <button class="action-btn excel" id="excel-btn">
+                <i class="fas fa-file-excel"></i> Export as Excel
+            </button>
+            
+            <button class="action-btn report" id="report-btn">
+                <i class="fas fa-file-alt"></i> Generate Daily Report
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to today
+            const today = new Date().toISOString().substr(0, 10);
+            document.getElementById('date').value = today;
+            
+            // Initialize entries array
+            let entries = JSON.parse(localStorage.getItem('daybookEntries')) || [];
+            let currentEditIndex = -1;
+            let sortField = 'date';
+            let sortDirection = 'desc';
+            let currentFilter = 'all';
+            let searchTerm = '';
+            
+            // Render entries and update totals
+            function renderEntries() {
+                const entriesList = document.getElementById('entries-list');
+                entriesList.innerHTML = '';
+                
+                // Filter and sort entries
+                let filteredEntries = filterEntries(entries);
+                filteredEntries = searchEntries(filteredEntries);
+                filteredEntries = sortEntries(filteredEntries);
+                
+                if (filteredEntries.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="5" style="text-align: center;">No transactions found</td>`;
+                    entriesList.appendChild(row);
+                    return;
+                }
+                
+                filteredEntries.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.date}</td>
+                        <td>${entry.type}</td>
+                        <td>AED ${parseFloat(entry.amount).toFixed(2)}</td>
+                        <td>${entry.remarks}</td>
+                        <td class="action-buttons">
+                            <button class="edit-btn" data-index="${entry.originalIndex}">Edit</button>
+                            <button class="delete-btn" data-index="${entry.originalIndex}">Delete</button>
+                        </td>
+                    `;
+                    entriesList.appendChild(row);
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        entries.splice(index, 1);
+                        localStorage.setItem('daybookEntries', JSON.stringify(entries));
+                        renderEntries();
+                        updateTotals();
+                    });
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        editEntry(index);
+                    });
+                });
+            }
+            
+            // Filter entries based on day filter
+            function filterEntries(entriesList) {
+                const now = new Date();
+                const today = now.toISOString().substr(0, 10);
+                
+                // Get yesterday's date
+                const yesterdayDate = new Date(now);
+                yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+                const yesterday = yesterdayDate.toISOString().substr(0, 10);
+                
+                // Get start of week (Sunday)
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                const startOfWeekStr = startOfWeek.toISOString().substr(0, 10);
+                
+                return entriesList.map((entry, index) => {
+                    return {...entry, originalIndex: index};
+                }).filter(entry => {
+                    if (currentFilter === 'all') return true;
+                    if (currentFilter === 'today') return entry.date === today;
+                    if (currentFilter === 'yesterday') return entry.date === yesterday;
+                    if (currentFilter === 'week') return entry.date >= startOfWeekStr;
+                    return true;
+                });
+            }
+            
+            // Search entries based on search term
+            function searchEntries(entriesList) {
+                if (!searchTerm) return entriesList;
+                
+                const term = searchTerm.toLowerCase();
+                return entriesList.filter(entry => {
+                    return (
+                        entry.remarks.toLowerCase().includes(term) ||
+                        entry.amount.toString().includes(term) ||
+                        entry.type.toLowerCase().includes(term)
+                    );
+                });
+            }
+            
+            // Sort entries based on selected field and direction
+            function sortEntries(entriesList) {
+                return entriesList.sort((a, b) => {
+                    let valueA, valueB;
+                    
+                    if (sortField === 'date') {
+                        valueA = new Date(a.date);
+                        valueB = new Date(b.date);
+                    } else if (sortField === 'amount') {
+                        valueA = parseFloat(a.amount);
+                        valueB = parseFloat(b.amount);
+                    } else {
+                        valueA = a[sortField];
+                        valueB = b[sortField];
+                    }
+                    
+                    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            
+            // Update summary totals
+            function updateTotals() {
+                let vendorTotal = 0;
+                let saleTotal = 0;
+                let othersTotal = 0;
+                
+                entries.forEach(entry => {
+                    const amount = parseFloat(entry.amount);
+                    if (entry.type === 'Payment Vendor') {
+                        vendorTotal += amount;
+                    } else if (entry.type === 'Sale') {
+                        saleTotal += amount;
+                    } else if (entry.type === 'Others') {
+                        othersTotal += amount;
+                    }
+                });
+                
+                document.getElementById('vendor-total').textContent = `AED ${vendorTotal.toFixed(2)}`;
+                document.getElementById('sale-total').textContent = `AED ${saleTotal.toFixed(2)}`;
+                document.getElementById('others-total').textContent = `AED ${othersTotal.toFixed(2)}`;
+            }
+            
+            // Add new entry
+            document.getElementById('add-entry').addEventListener('click', function() {
+                const date = document.getElementById('date').value;
+                const type = document.getElementById('type').value;
+                const amount = document.getElementById('amount').value;
+                const remarks = document.getElementById('remarks').value;
+                
+                if (!date || !type || !amount || !remarks) {
+                    alert('Please fill all fields');
+                    return;
+                }
+                
+                const newEntry = {
+                    date,
+                    type,
+                    amount: parseFloat(amount).toFixed(2),
+                    remarks
+                };
+                
+                entries.push(newEntry);
+                localStorage.setItem('daybookEntries', JSON.stringify(entries));
+                
+                // Clear form
+                document.getElementById('type').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('remarks').value = '';
+                
+                renderEntries();
+                updateTotals();
+            });
+            
+            // Edit entry
+            function editEntry(index) {
+                const entry = entries[index];
+                document.getElementById('date').value = entry.date;
+                document.getElementById('type').value = entry.type;
+                document.getElementById('amount').value = entry.amount;
+                document.getElementById('remarks').value = entry.remarks;
+                
+                currentEditIndex = index;
+                
+                document.getElementById('add-entry').style.display = 'none';
+                document.getElementById('update-entry').style.display = 'block';
+                document.getElementById('cancel-edit').style.display = 'block';
+            }
+            
+            // Update entry
+            document.getElementById('update-entry').addEventListener('click', function() {
+                if (currentEditIndex === -1) return;
+                
+                const date = document.getElementById('date').value;
+                const type = document.getElementById('type').value;
+                const amount = document.getElementById('amount').value;
+                const remarks = document.getElementById('remarks').value;
+                
+                if (!date || !type || !amount || !remarks) {
+                    alert('Please fill all fields');
+                    return;
+                }
+                
+                entries[currentEditIndex] = {
+                    date,
+                    type,
+                    amount: parseFloat(amount).toFixed(2),
+                    remarks
+                };
+                
+                localStorage.setItem('daybookEntries', JSON.stringify(entries));
+                
+                // Clear form and reset buttons
+                document.getElementById('type').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('remarks').value = '';
+                
+                document.getElementById('add-entry').style.display = 'block';
+                document.getElementById('update-entry').style.display = 'none';
+                document.getElementById('cancel-edit').style.display = 'none';
+                
+                currentEditIndex = -1;
+                
+                renderEntries();
+                updateTotals();
+            });
+            
+            // Cancel edit
+            document.getElementById('cancel-edit').addEventListener('click', function() {
+                document.getElementById('type').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('remarks').value = '';
+                
+                document.getElementById('add-entry').style.display = 'block';
+                document.getElementById('update-entry').style.display = 'none';
+                document.getElementById('cancel-edit').style.display = 'none';
+                
+                currentEditIndex = -1;
+            });
+            
+            // Export to Excel
+            document.getElementById('excel-btn').addEventListener('click', function() {
+                // Prepare data for export
+                const data = [
+                    ['Date', 'Type', 'Amount (AED)', 'Remarks']
+                ];
+                
+                entries.forEach(entry => {
+                    data.push([entry.date, entry.type, entry.amount, entry.remarks]);
+                });
+                
+                // Add totals
+                data.push([]);
+                data.push(['TOTALS', '', '', '']);
+                
+                let vendorTotal = 0;
+                let saleTotal = 0;
+                let othersTotal = 0;
+                
+                entries.forEach(entry => {
+                    const amount = parseFloat(entry.amount);
+                    if (entry.type === 'Payment Vendor') vendorTotal += amount;
+                    else if (entry.type === 'Sale') saleTotal += amount;
+                    else if (entry.type === 'Others') othersTotal += amount;
+                });
+                
+                data.push(['Vendor Payments', '', `AED ${vendorTotal.toFixed(2)}`, '']);
+                data.push(['Sales', '', `AED ${saleTotal.toFixed(2)}`, '']);
+                data.push(['Others', '', `AED ${othersTotal.toFixed(2)}`, '']);
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Daybook');
+                
+                // Export to file
+                XLSX.writeFile(wb, `AK_Store_Daybook_${today}.xlsx`);
+            });
+            
+            // Send via WhatsApp
+            document.getElementById('whatsapp-btn').addEventListener('click', function() {
+                let message = `*AK Store Daybook - ${today}*\n\n`;
+                
+                entries.forEach(entry => {
+                    message += `📅 ${entry.date} | ${entry.type} | AED ${entry.amount} | ${entry.remarks}\n`;
+                });
+                
+                message += '\n*TOTALS*\n';
+                
+                let vendorTotal = 0;
+                let saleTotal = 0;
+                let othersTotal = 0;
+                
+                entries.forEach(entry => {
+                    const amount = parseFloat(entry.amount);
+                    if (entry.type === 'Payment Vendor') vendorTotal += amount;
+                    else if (entry.type === 'Sale') saleTotal += amount;
+                    else if (entry.type === 'Others') othersTotal += amount;
+                });
+                
+                message += `Vendor Payments: AED ${vendorTotal.toFixed(2)}\n`;
+                message += `Sales: AED ${saleTotal.toFixed(2)}\n`;
+                message += `Others: AED ${othersTotal.toFixed(2)}\n`;
+                
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            });
+            
+            // Generate report
+            document.getElementById('report-btn').addEventListener('click', function() {
+                // Calculate totals
+                let vendorTotal = 0;
+                let saleTotal = 0;
+                let othersTotal = 0;
+                
+                entries.forEach(entry => {
+                    const amount = parseFloat(entry.amount);
+                    if (entry.type === 'Payment Vendor') vendorTotal += amount;
+                    else if (entry.type === 'Sale') saleTotal += amount;
+                    else if (entry.type === 'Others') othersTotal += amount;
+                });
+                
+                // Create report content
+                const reportContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Daybook Report | AK Store</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 40px; }
+                            h1 { color: #2c3e50; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                            th { background-color: #4a6491; color: white; }
+                            .summary { display: flex; gap: 20px; margin: 20px 0; }
+                            .summary-box { flex: 1; padding: 15px; border-radius: 5px; color: white; }
+                            .vendor { background-color: #FF6B6B; }
+                            .sale { background-color: #25D366; }
+                            .others { background-color: #4a6491; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>AK Store Daybook Report</h1>
+                        <p><strong>Date:</strong> ${today}</p>
+                        <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                        
+                        <h2>Transaction Details</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount (AED)</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${entries.map(entry => `
+                                    <tr>
+                                        <td>${entry.date}</td>
+                                        <td>${entry.type}</td>
+                                        <td>AED ${entry.amount}</td>
+                                        <td>${entry.remarks}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <div class="summary">
+                            <div class="summary-box vendor">
+                                <h3>Vendor Payments</h3>
+                                <p>AED ${vendorTotal.toFixed(2)}</p>
+                            </div>
+                            <div class="summary-box sale">
+                                <h3>Sales</h3>
+                                <p>AED ${saleTotal.toFixed(2)}</p>
+                            </div>
+                            <div class="summary-box others">
+                                <h3>Other Transactions</h3>
+                                <p>AED ${othersTotal.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        
+                        <p>Report generated by AK Store Daybook System</p>
+                    </body>
+                    </html>
+                `;
+                
+                // Open report in new window
+                const reportWindow = window.open('', '_blank');
+                reportWindow.document.write(reportContent);
+                reportWindow.document.close();
+            });
+            
+            // Search functionality
+            document.getElementById('search-btn').addEventListener('click', function() {
+                searchTerm = document.getElementById('search-input').value;
+                renderEntries();
+            });
+            
+            // Clear search
+            document.getElementById('clear-search').addEventListener('click', function() {
+                document.getElementById('search-input').value = '';
+                searchTerm = '';
+                renderEntries();
+            });
+            
+            // Day filters
+            document.getElementById('all-days').addEventListener('click', function() {
+                currentFilter = 'all';
+                setActiveDayFilter('all-days');
+                renderEntries();
+            });
+            
+            document.getElementById('today').addEventListener('click', function() {
+                currentFilter = 'today';
+                setActiveDayFilter('today');
+                renderEntries();
+            });
+            
+            document.getElementById('yesterday').addEventListener('click', function() {
+                currentFilter = 'yesterday';
+                setActiveDayFilter('yesterday');
+                renderEntries();
+            });
+            
+            document.getElementById('this-week').addEventListener('click', function() {
+                currentFilter = 'week';
+                setActiveDayFilter('this-week');
+                renderEntries();
+            });
+            
+            function setActiveDayFilter(activeId) {
+                document.getElementById('all-days').classList.remove('active-day');
+                document.getElementById('today').classList.remove('active-day');
+                document.getElementById('yesterday').classList.remove('active-day');
+                document.getElementById('this-week').classList.remove('active-day');
+                
+                document.getElementById(activeId).classList.add('active-day');
+            }
+            
+            // Sort functionality
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', function() {
+                    const field = this.getAttribute('data-sort');
+                    
+                    if (sortField === field) {
+                        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortField = field;
+                        sortDirection = 'asc';
+                    }
+                    
+                    renderEntries();
+                });
+            });
+            
+            // Initial render
+            renderEntries();
+            updateTotals();
+        });
+    </script>
+</body>
+</html>
